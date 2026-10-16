@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    background: #faf6ef;
+    color: #344b3f;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-cream font-sans text-forest antialiased;
+    min-height: 100dvh;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  h1, h2, h3 {
+    @apply font-serif tracking-tight;
+  }
+  :focus-visible {
+    outline: 2px solid #c8795a;
+    outline-offset: 2px;
+    border-radius: 8px;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-3xl bg-white/80 p-5 shadow-soft ring-1 ring-forest/5;
+  }
+  .btn {
+    @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 text-base font-medium transition active:scale-[0.98] disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply btn bg-forest text-cream shadow-soft hover:bg-forest-soft;
+  }
+  .btn-warm {
+    @apply btn bg-terracotta text-white shadow-soft hover:bg-terracotta-deep;
+  }
+  .btn-quiet {
+    @apply btn bg-transparent text-forest ring-1 ring-forest/20 hover:bg-forest/5;
+  }
+  .input {
+    @apply min-h-12 w-full rounded-2xl border-0 bg-white px-4 text-base text-forest shadow-inner ring-1 ring-forest/15 placeholder:text-forest/40 focus:ring-2 focus:ring-terracotta;
+  }
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-forest/80;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
