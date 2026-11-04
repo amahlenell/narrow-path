@@ -1,70 +1,96 @@
 # The Narrow Path
 
-A private, two-person web app for Amy & Aaron: a shared streak shown as a winding mountain path toward a cross, with daily check-ins, grace-centred resets, milestones and rewards, and a "Growing Together" section. Next.js 15 · TypeScript · Tailwind · Supabase (Auth, Postgres + RLS, Realtime, Storage) · Motion · Lucide.
+A private, two-person faith-based application for building consistency, strengthening connection, and growing together in faith. Follow a shared mountain path toward the cross through daily check-ins, meaningful milestones, grace-centred resets, and spiritual reflection.
 
-## What works today
+Built with Next.js 15, TypeScript, Tailwind CSS, Supabase, Motion, and Lucide.
 
-| Area | Status |
-|---|---|
-| Accounts (email + password), two-person couple, invite code | Working |
-| Daily check-in, both must confirm, Pacific/Auckland days, no duplicates, one-day late grace | Working (rules enforced in Postgres, mirrored in `src/lib/streak.ts`) |
-| Shared streak, lifetime stats (separate from current streak) | Working |
-| Reset with reflection (private to author), two-step confirm, challenge, return-to-start animation | Working |
-| Milestones 3…365 + custom, badges (kept after reset), reward suggestions + joint voting | Working |
-| Interactive pathway with changing scenery and both characters | Working |
-| Calendar history (walked / open / not confirmed / fresh start) | Working |
-| Growing Together: scripture, devotional, question, shared prayer list, hard-day encouragement | Working (curated content, no AI) |
-| Wedding countdown, hidden until a date is added | Working |
-| Live updates between partners (Supabase Realtime + refresh on app focus) | Working once Realtime is on (default in the migration) |
-| PWA: installable manifest, icons, offline page | Working |
-| Web push notifications + preferences screen | Code written, DB tested. **Needs your VAPID keys; real-device delivery untested.** See `docs/NOTIFICATIONS.md` |
-| PIN app lock (set / change / remove / lock now) | Working once `PIN_COOKIE_SECRET` is set |
-| Crucifixion scene at the end of the path; characters styled from your reference picture | Done |
-| **Photo avatars** | **Private bucket + policies done.** No upload screen yet |
+## Features
 
-## Verification status (be aware)
+- **Shared journey:** An interactive mountain pathway with evolving scenery, animated characters, and a visual representation of shared progress.
+- **Daily check-ins:** Mutual confirmation, Auckland-local dates, duplicate prevention, and a one-day grace period.
+- **Streaks and milestones:** Shared streak tracking, lifetime statistics, milestone rewards, badges, and custom goals.
+- **Grace-centred resets:** Reflect privately, confirm a fresh start, and continue the journey without losing earned badges.
+- **Shared rewards:** Suggest rewards and vote together on milestones worth celebrating.
+- **Journey history:** Calendar view of completed days, missed confirmations, and fresh starts.
+- **Growing Together:** Curated scripture, devotionals, reflection questions, shared prayer lists, and encouragement for difficult days.
+- **Live synchronisation:** Supabase Realtime keeps both partners' progress in sync.
+- **Wedding countdown:** Optional countdown displayed once a date is configured.
+- **Installable PWA:** Home-screen installation, app icons, and an offline page.
+- **App lock:** Optional PIN protection with rate limiting.
+- **Push notifications:** Notification preferences and web push infrastructure, requiring VAPID configuration for delivery.
 
-- `npm test` — 35 pure-logic tests (streak rules, Auckland dates incl. daylight saving, path geometry). **Passing.**
-- `npm run test:db` — runs both migrations against a throwaway Postgres and tests RLS, check-in, reset, rewards, PIN and push-subscription privacy. **Passing.**
-- The UI code (everything under `src/app` and `src/components`) was written in an environment with no access to the npm registry, so **`npm install`, `npm run typecheck` and `npm run build` have not been run yet.** Expect to fix a few small type or import issues on first build. Run those first.
+## Tech Stack
 
-## Run it locally
+Next.js 15, TypeScript, Tailwind CSS, Supabase Auth, PostgreSQL, Row Level Security, Supabase Realtime, Supabase Storage, Motion, and Lucide.
 
-1. `npm install`
-2. Create a Supabase project (free tier is fine).
-3. In Supabase → **SQL Editor**, paste and run `supabase/migrations/0001_init.sql`, then `0002_push.sql`.
-4. Supabase → **Authentication → Email templates → Confirm signup**: set the link to
-   `{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=email`
-5. Supabase → **Authentication → URL Configuration**: Site URL `http://localhost:3000`; add `http://localhost:3000/**` to Redirect URLs.
-6. Copy `.env.example` to `.env.local` and fill in the project URL and anon/publishable key (Project Settings → API). **Never** put a service-role key in this app; it doesn't need one.
-7. Optional: set `PIN_COOKIE_SECRET` (`openssl rand -base64 48`) to enable the PIN lock; see `docs/NOTIFICATIONS.md` for push.
-8. `npm run dev`, open http://localhost:3000.
-9. Amy signs up → "Begin our path" → copies the invite code. Aaron signs up → "Join your partner". The path begins that day.
+## Local Development
 
-Optional: to stop strangers creating accounts once you both have yours, turn off **Authentication → Sign In / Providers → Allow new users to sign up**. (The database already refuses a third person joining a couple.)
+### Requirements
 
-### Refresh an expired invite
+- Node.js and npm
+- A Supabase project
 
-```sql
-update public.couples set invite_expires_at = now() + interval '7 days' where created_by = '<your user id>';
+### Setup
+
+```bash
+npm install
 ```
 
-## Deploy to Vercel
+1. Create a Supabase project.
+2. Run `supabase/migrations/0001_init.sql` and `0002_push.sql` in the Supabase SQL Editor.
+3. Configure the signup confirmation template to use:
 
-1. Push this folder to a GitHub repository (private).
-2. Vercel → **Add New Project** → import it. Framework is detected as Next.js.
-3. Add environment variables: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_SITE_URL` (your Vercel URL), plus `PIN_COOKIE_SECRET` and the push variables from `.env.example` if you want those features.
-4. Deploy. Then in Supabase set the **Site URL** to the Vercel URL and add `https://YOUR-APP.vercel.app/**` to Redirect URLs.
-5. On each phone, open the site and choose **Share → Add to Home Screen** (iPhone) or **Install app** (Android).
+   `{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=email`
 
-## Security notes
+4. Set the Supabase Site URL to `http://localhost:3000` and allow `http://localhost:3000/**` as a redirect.
+5. Copy `.env.example` to `.env.local` and configure the Supabase URL and publishable key.
+6. Optionally configure `PIN_COOKIE_SECRET` and the push notification variables.
 
-- Every table has Row Level Security; people can only read their own couple's rows.
-- All changes to shared progress go through `SECURITY DEFINER` functions that check who is calling and the rules (no future dates, no backfilling beyond yesterday, one check-in per person per day, reset needs explicit confirmation).
-- Reset reflections are readable only by their author (RLS), not even the partner.
-- PINs are bcrypt-hashed, rate-limited (5 tries → 15 minute lock) and never readable by the client. The PIN is a convenience lock on top of real authentication, not a replacement.
-- The middleware validates the session with `auth.getUser()` on every request.
+Never expose a Supabase service-role key in the application.
 
-## Project map
+Start the development server:
 
-See `docs/ARCHITECTURE.md`.
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+The first person creates the couple and shares an invitation code. The second person joins using that code, and the shared journey begins.
+
+## Verification
+
+```bash
+npm test
+npm run test:db
+npm run typecheck
+npm run build
+```
+
+The 35 pure-logic tests and database tests have passed. Type checking and production builds have not yet been verified and should be run during initial setup.
+
+## Deployment
+
+Deploy to Vercel by importing the private GitHub repository and configuring the required environment variables.
+
+After deployment, update the Supabase Site URL and redirect URLs to match the production domain. Install the app on mobile using the browser's Add to Home Screen or Install App option.
+
+See `docs/NOTIFICATIONS.md` for push notification setup and `docs/ARCHITECTURE.md` for the project structure.
+
+## Security
+
+- Row Level Security restricts access to each couple's data.
+- Shared progress changes use database functions that validate permissions and check-in rules.
+- Reflection notes are private to their author.
+- PINs are bcrypt-hashed and rate-limited.
+- Authentication sessions are validated on each request.
+
+## Current Limitations
+
+- Push notification delivery requires VAPID keys and real-device testing.
+- Photo avatar storage policies are implemented, but the upload interface is not yet available.
+- Type checking and production build verification remain outstanding.
+
+## Project Structure
+
+See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for the application structure and technical decisions.
