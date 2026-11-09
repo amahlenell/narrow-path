@@ -67,8 +67,6 @@ npm run typecheck
 npm run build
 ```
 
-The 35 pure-logic tests and database tests have passed. Type checking and production builds have not yet been verified and should be run during initial setup.
-
 ## Deployment
 
 Deploy to Vercel by importing the private GitHub repository and configuring the required environment variables.
