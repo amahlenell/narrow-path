@@ -1,6 +1,6 @@
 # The Narrow Path
 
-A private, two-person faith-based application for building consistency, strengthening connection, and growing together in faith. Follow a shared mountain path toward the cross through daily check-ins, meaningful milestones, grace-centred resets, and spiritual reflection.
+A faith-based app for couples to track shared goals, daily check-ins and reflections.
 
 Built with Next.js 15, TypeScript, Tailwind CSS, Supabase, Motion, and Lucide.
 
@@ -69,7 +69,7 @@ npm run build
 
 ## Deployment
 
-Deploy to Vercel by importing the private GitHub repository and configuring the required environment variables.
+Deploy to Vercel by importing the GitHub repository and configuring the required environment variables.
 
 After deployment, update the Supabase Site URL and redirect URLs to match the production domain. Install the app on mobile using the browser's Add to Home Screen or Install App option.
 
